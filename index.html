@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<script>
+try {
+  const saved = localStorage.getItem('dsh-color-scheme');
+  if (saved === 'light' || saved === 'dark') {
+    document.querySelector('meta[name="color-scheme"]').content = saved;
+  }
+} catch {}
+</script>
+<meta name="description" content="DeepSeek Harness Plugins by Yishan: usage & cost observability, turn sequence replay, a multi-track browser synthesizer, and native-IME typing practice.">
+<title>DeepSeek Harness Plugins — by Yishan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="styles.css">
+<script src="app.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#plugins">Skip to plugins</a>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="topbar-nav" aria-label="Plugins">
+      <a href="#burn">Burn</a>
+      <a href="#sequence">Sequence</a>
+      <a href="#synthesizer">Synthesizer</a>
+      <a href="#typing">Typing</a>
+    </nav>
+    <div class="topbar-actions">
+      <a class="topbar-link" href="https://github.com/yishan/dsh">GitHub</a>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Switch color scheme" hidden>
+        <svg class="icon-sun" viewBox="0 0 20 20" aria-hidden="true">
+          <circle cx="10" cy="10" r="3.5"/>
+          <path d="M10 2.5v1.8M10 15.7v1.8M2.5 10h1.8M15.7 10h1.8M4.7 4.7l1.3 1.3M14 14l1.3 1.3M4.7 15.3L6 14M14 6l1.3-1.3"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M16.5 11.4A6.8 6.8 0 0 1 8.6 3.5a6.8 6.8 0 1 0 7.9 7.9Z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <section class="hero" aria-labelledby="page-title">
+    <p class="eyebrow">DSH · CORDIS EXTENSIONS · 4 PLUGINS</p>
+    <h1 id="page-title">DeepSeek Harness Plugins</h1>
+    <p class="vice-title">by <a href="https://yishan.li">Yishan</a></p>
+    <p class="lead">Four focused plugins for the DeepSeek Harness Web UI and CLI: track token spend and activity heatmaps, replay agent tool-call sequences, sketch loops on a Web Audio groovebox, and practice typing with your native IME.</p>
+
+    <ul class="index-grid" role="list" aria-label="Plugin index">
+      <li>
+        <a href="#burn">
+          <span class="index-meta"><span class="index-num">01</span><span class="version">v1.4.1</span></span>
+          <span class="index-name">dsh-burn</span>
+          <span class="index-desc">Token buckets, heatmaps &amp; multi-provider cost</span>
+        </a>
+      </li>
+      <li>
+        <a href="#sequence">
+          <span class="index-meta"><span class="index-num">02</span><span class="version">v0.1.0</span></span>
+          <span class="index-name">dsh-sequence</span>
+          <span class="index-desc">Per-turn tool-call sequence &amp; replay</span>
+        </a>
+      </li>
+      <li>
+        <a href="#synthesizer">
+          <span class="index-meta"><span class="index-num">03</span><span class="version">v1.3.0</span></span>
+          <span class="index-name">dsh-synthesizer</span>
+          <span class="index-desc">Multi-track Web Audio groovebox</span>
+        </a>
+      </li>
+      <li>
+        <a href="#typing">
+          <span class="index-meta"><span class="index-num">04</span><span class="version">v0.2.0</span></span>
+          <span class="index-name">dsh-typing-practice</span>
+          <span class="index-desc">Native-IME typing &amp; falling words</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <div id="plugins" class="plugin-stack">
+    <!-- 01: dsh-burn -->
+    <article class="plugin" id="burn" aria-labelledby="title-burn">
+      <header class="plugin-head">
+        <div class="plugin-title-row">
+          <span class="eyebrow">01 · OBSERVABILITY</span>
+          <span class="version">v1.4.1</span>
+          <a class="repo-link" href="https://github.com/yishan/dsh-burn">yishan/dsh-burn</a>
+        </div>
+        <h2 id="title-burn">dsh-burn</h2>
+      </header>
+      <p class="plugin-summary">Usage and cost dashboard for DeepSeek Harness. Folds owned session usage into four non-overlapping token buckets, renders calendar, weekday-hour, and provider heatmaps with local ECharts SVG, and tracks multi-provider pricing and account balances.</p>
+
+      <figure class="fig">
+        <svg viewBox="0 0 720 256" role="img" aria-labelledby="fig-burn-title fig-burn-desc">
+          <title id="fig-burn-title">dsh-burn data flow schematic</title>
+          <desc id="fig-burn-desc">Session logs filtered to owned scope feed a four-bucket token fold and multi-provider pricing engine, producing heatmaps, balances, and CSV exports.</desc>
+
+          <!-- Zone 1: Session Logs -->
+          <rect x="16" y="16" width="204" height="196" rx="4" class="svg-zone"/>
+          <text x="28" y="34" class="svg-eyebrow">01 · SESSION LOGS</text>
+          <rect x="28" y="48" width="180" height="48" rx="4" class="svg-node"/>
+          <text x="38" y="68" class="svg-name">sessionQuery</text>
+          <text x="38" y="83" class="svg-mono">scope: owned · no fork prefix</text>
+          <rect x="28" y="108" width="180" height="48" rx="4" class="svg-node"/>
+          <text x="38" y="128" class="svg-name">Provider × Model</text>
+          <text x="38" y="143" class="svg-mono">route id · exact model match</text>
+          <rect x="28" y="168" width="180" height="32" rx="4" class="svg-node-soft"/>
+          <text x="38" y="188" class="svg-mono">peak / off-peak · holidays</text>
+
+          <!-- Connector 1 -> 2 -->
+          <line x1="220" y1="114" x2="246" y2="114" class="svg-arrow"/>
+          <polygon points="246,110 254,114 246,118" class="svg-arrowhead"/>
+
+          <!-- Zone 2: 4-Bucket Fold -->
+          <rect x="254" y="16" width="212" height="196" rx="4" class="svg-zone"/>
+          <text x="266" y="34" class="svg-eyebrow">02 · USAGE FOLD</text>
+          <rect x="266" y="48" width="188" height="32" rx="4" class="svg-node"/>
+          <text x="276" y="68" class="svg-name">Uncached Input</text>
+          <text x="444" y="68" text-anchor="end" class="svg-mono">rate × tok</text>
+
+          <rect x="266" y="86" width="188" height="32" rx="4" class="svg-node-accent"/>
+          <text x="276" y="106" class="svg-name">Cache Read</text>
+          <text x="444" y="106" text-anchor="end" class="svg-mono-accent">0.04 / 1M</text>
+
+          <rect x="266" y="124" width="188" height="32" rx="4" class="svg-node"/>
+          <text x="276" y="144" class="svg-name">Cache Write</text>
+          <text x="444" y="144" text-anchor="end" class="svg-mono">override</text>
+
+          <rect x="266" y="162" width="188" height="32" rx="4" class="svg-node"/>
+          <text x="276" y="182" class="svg-name">Output</text>
+          <text x="444" y="182" text-anchor="end" class="svg-mono">rate × tok</text>
+
+          <!-- Connector 2 -> 3 -->
+          <line x1="466" y1="114" x2="492" y2="114" class="svg-arrow"/>
+          <polygon points="492,110 500,114 492,118" class="svg-arrowhead"/>
+
+          <!-- Zone 3: Dashboard -->
+          <rect x="500" y="16" width="204" height="196" rx="4" class="svg-zone"/>
+          <text x="512" y="34" class="svg-eyebrow">03 · ECHARTS SVG</text>
+          <text x="512" y="56" class="svg-name">Weekday × Hour Heatmap</text>
+          <!-- 7x4 miniature heatmap -->
+          <g transform="translate(512,68)">
+            <rect x="0" y="0" width="22" height="16" rx="2" class="svg-cell-1"/>
+            <rect x="26" y="0" width="22" height="16" rx="2" class="svg-cell-2"/>
+            <rect x="52" y="0" width="22" height="16" rx="2" class="svg-cell-1"/>
+            <rect x="78" y="0" width="22" height="16" rx="2" class="svg-cell-hot"/>
+            <rect x="104" y="0" width="22" height="16" rx="2" class="svg-cell-2"/>
+            <rect x="130" y="0" width="22" height="16" rx="2" class="svg-cell-1"/>
+            <rect x="156" y="0" width="22" height="16" rx="2" class="svg-cell-1"/>
+
+            <rect x="0" y="20" width="22" height="16" rx="2" class="svg-cell-2"/>
+            <rect x="26" y="20" width="22" height="16" rx="2" class="svg-cell-hot"/>
+            <rect x="52" y="20" width="22" height="16" rx="2" class="svg-cell-2"/>
+            <rect x="78" y="20" width="22" height="16" rx="2" class="svg-cell-2"/>
+            <rect x="104" y="20" width="22" height="16" rx="2" class="svg-cell-1"/>
+            <rect x="130" y="20" width="22" height="16" rx="2" class="svg-cell-1"/>
+            <rect x="156" y="20" width="22" height="16" rx="2" class="svg-cell-0"/>
+
+            <rect x="0" y="40" width="22" height="16" rx="2" class="svg-cell-1"/>
+            <rect x="26" y="40" width="22" height="16" rx="2" class="svg-cell-2"/>
+            <rect x="52" y="40" width="22" height="16" rx="2" class="svg-cell-hot"/>
+            <rect x="78" y="40" width="22" height="16" rx="2" class="svg-cell-1"/>
+            <rect x="104" y="40" width="22" height="16" rx="2" class="svg-cell-2"/>
+            <rect x="130" y="40" width="22" height="16" rx="2" class="svg-cell-0"/>
+            <rect x="156" y="40" width="22" height="16" rx="2" class="svg-cell-0"/>
+          </g>
+          <rect x="512" y="138" width="180" height="28" rx="4" class="svg-node"/>
+          <text x="522" y="156" class="svg-mono">CNY · USD separate · budgets</text>
+          <rect x="512" y="172" width="180" height="28" rx="4" class="svg-node-soft"/>
+          <text x="522" y="190" class="svg-mono">0600 cache · CSV export</text>
+
+          <!-- Legend strip -->
+          <line x1="16" y1="224" x2="704" y2="224" class="svg-rule"/>
+          <rect x="16" y="234" width="10" height="10" rx="2" class="svg-node"/>
+          <text x="32" y="243" class="svg-mono">Token bucket / view</text>
+          <rect x="176" y="234" width="10" height="10" rx="2" class="svg-node-accent"/>
+          <text x="192" y="243" class="svg-mono">Focal cache-hit / peak cell</text>
+          <text x="704" y="243" text-anchor="end" class="svg-mono">DSH &gt;= 0.2.1-rc.5</text>
+        </svg>
+        <figcaption>Fig 1 — Owned session usage folds into four token buckets, exact provider/model rates, and interactive SVG heatmaps.</figcaption>
+      </figure>
+
+      <div class="copy-row">
+        <pre><code id="code-burn">dsh plugin add github:yishan/dsh-burn</code></pre>
+        <span class="copy">
+          <button type="button" class="copy-button" command="--copy" commandfor="code-burn" aria-label="Copy dsh-burn install command">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5v-.5A1 1 0 0 0 9.5 2H3a1 1 0 0 0-1 1v6.5a1 1 0 0 0 1 1h.5"/></svg>
+          </button>
+          <span class="tip" role="status"></span>
+        </span>
+      </div>
+    </article>
+
+    <!-- 02: dsh-sequence -->
+    <article class="plugin" id="sequence" aria-labelledby="title-sequence">
+      <header class="plugin-head">
+        <div class="plugin-title-row">
+          <span class="eyebrow">02 · INSPECTION</span>
+          <span class="version">v0.1.0</span>
+          <a class="repo-link" href="https://github.com/yishan/dsh-sequence">yishan/dsh-sequence</a>
+        </div>
+        <h2 id="title-sequence">dsh-sequence</h2>
+      </header>
+      <p class="plugin-summary">In-conversation per-turn agent tool-call sequence diagram and animated playback. Compiles DSH trajectory events into deterministic SVG swimlanes with parallel groups, error/retry markers, slow-call badges, and one-click HTML export.</p>
+
+      <figure class="fig">
+        <svg viewBox="0 0 720 256" role="img" aria-labelledby="fig-seq-title fig-seq-desc">
+          <title id="fig-seq-title">dsh-sequence swimlane and playback schematic</title>
+          <desc id="fig-seq-desc">Four lifelines (User, Agent, Tools, Subagents) showing sequential and parallel tool calls, retry markers, and the bottom playback scrubber.</desc>
+
+          <!-- Actor Headers -->
+          <rect x="44" y="16" width="96" height="28" rx="4" class="svg-node"/>
+          <text x="92" y="34" text-anchor="middle" class="svg-name">User</text>
+
+          <rect x="212" y="16" width="96" height="28" rx="4" class="svg-node-accent"/>
+          <text x="260" y="34" text-anchor="middle" class="svg-name">Agent</text>
+
+          <rect x="392" y="16" width="96" height="28" rx="4" class="svg-node"/>
+          <text x="440" y="34" text-anchor="middle" class="svg-name">Tools</text>
+
+          <rect x="572" y="16" width="96" height="28" rx="4" class="svg-node"/>
+          <text x="620" y="34" text-anchor="middle" class="svg-name">Subagents</text>
+
+          <!-- Lifelines -->
+          <line x1="92" y1="44" x2="92" y2="206" class="svg-lifeline"/>
+          <line x1="260" y1="44" x2="260" y2="206" class="svg-lifeline"/>
+          <line x1="440" y1="44" x2="440" y2="206" class="svg-lifeline"/>
+          <line x1="620" y1="44" x2="620" y2="206" class="svg-lifeline"/>
+
+          <!-- Activation bars -->
+          <rect x="256" y="64" width="8" height="132" rx="2" class="svg-activation"/>
+          <rect x="436" y="102" width="8" height="24" rx="2" class="svg-activation"/>
+          <rect x="616" y="124" width="8" height="26" rx="2" class="svg-activation-accent"/>
+          <rect x="436" y="158" width="8" height="22" rx="2" class="svg-activation"/>
+
+          <!-- Message 1: User -> Agent -->
+          <line x1="92" y1="68" x2="248" y2="68" class="svg-arrow"/>
+          <polygon points="248,64 256,68 248,72" class="svg-arrowhead"/>
+          <text x="174" y="62" text-anchor="middle" class="svg-mono">turn prompt</text>
+
+          <!-- PAR Frame -->
+          <rect x="236" y="84" width="408" height="70" rx="4" class="svg-frame"/>
+          <rect x="236" y="84" width="36" height="16" rx="2" class="svg-tab"/>
+          <text x="254" y="95" text-anchor="middle" class="svg-eyebrow">PAR</text>
+
+          <!-- Par call 1: Agent -> Tools -->
+          <line x1="264" y1="108" x2="428" y2="108" class="svg-arrow"/>
+          <polygon points="428,104 436,108 428,112" class="svg-arrowhead"/>
+          <text x="350" y="102" text-anchor="middle" class="svg-mono">read_file</text>
+
+          <!-- Par call 2: Agent -> Subagents (focal) -->
+          <line x1="264" y1="132" x2="608" y2="132" class="svg-arrow-accent"/>
+          <polygon points="608,128 616,132 608,136" class="svg-arrowhead-accent"/>
+          <text x="528" y="126" text-anchor="middle" class="svg-mono-accent">invoke_subagent (live)</text>
+
+          <!-- Retry / Slow call -->
+          <line x1="436" y1="172" x2="272" y2="172" class="svg-arrow-dashed"/>
+          <polygon points="272,168 264,172 272,176" class="svg-arrowhead"/>
+          <text x="350" y="166" text-anchor="middle" class="svg-mono">retry · &gt;= 3s marker</text>
+
+          <!-- Response: Agent -> User -->
+          <line x1="256" y1="194" x2="100" y2="194" class="svg-arrow-dashed"/>
+          <polygon points="100,190 92,194 100,198" class="svg-arrowhead"/>
+          <text x="174" y="188" text-anchor="middle" class="svg-mono">assistant output</text>
+
+          <!-- Playback Scrubber Strip -->
+          <line x1="16" y1="220" x2="704" y2="220" class="svg-rule"/>
+          <text x="16" y="240" class="svg-mono">PLAY / STEP &lt;- -&gt; · 0.5x–5x</text>
+          <line x1="240" y1="236" x2="490" y2="236" class="svg-rule-solid"/>
+          <circle cx="388" cy="236" r="4" class="svg-dot-accent"/>
+          <text x="704" y="240" text-anchor="end" class="svg-mono">ISSUES ONLY · EXPORT SVG / HTML</text>
+        </svg>
+        <figcaption>Fig 2 — Right-sidebar quick jump and full-width conversation tab share one playback cursor across Timeline and Sequence views.</figcaption>
+      </figure>
+
+      <div class="copy-row">
+        <pre><code id="code-sequence">dsh plugin add dsh-sequence</code></pre>
+        <span class="copy">
+          <button type="button" class="copy-button" command="--copy" commandfor="code-sequence" aria-label="Copy dsh-sequence install command">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5v-.5A1 1 0 0 0 9.5 2H3a1 1 0 0 0-1 1v6.5a1 1 0 0 0 1 1h.5"/></svg>
+          </button>
+          <span class="tip" role="status"></span>
+        </span>
+      </div>
+    </article>
+
+    <!-- 03: dsh-synthesizer -->
+    <article class="plugin" id="synthesizer" aria-labelledby="title-synthesizer">
+      <header class="plugin-head">
+        <div class="plugin-title-row">
+          <span class="eyebrow">03 · AUDIO</span>
+          <span class="version">v1.3.0</span>
+          <a class="repo-link" href="https://github.com/yishan/dsh-synthesizer">yishan/dsh-synthesizer</a>
+        </div>
+        <h2 id="title-synthesizer">dsh-synthesizer</h2>
+      </header>
+      <p class="plugin-summary">Multi-track browser synthesizer and pocket groovebox inside DeepSeek Harness. Sketch melodies on a piano roll or 8-piece drum stepper, sculpt tone with a real-time Web Audio subtractive engine, and keep loops playing in the background while you chat.</p>
+
+      <figure class="fig">
+        <svg viewBox="0 0 720 256" role="img" aria-labelledby="fig-synth-title fig-synth-desc">
+          <title id="fig-synth-title">dsh-synthesizer groovebox and signal chain schematic</title>
+          <desc id="fig-synth-desc">Three-layer groovebox showing transport controls, piano roll and drum step grid, and the Web Audio subtractive synthesis signal chain.</desc>
+
+          <!-- Top transport bar -->
+          <rect x="16" y="16" width="688" height="32" rx="4" class="svg-zone"/>
+          <text x="28" y="36" class="svg-mono">TRANSPORT: PLAY / LOOP</text>
+          <text x="236" y="36" class="svg-mono">120 BPM · SWING 33%</text>
+          <text x="430" y="36" class="svg-mono">4 BARS · ⌘Z UNDO</text>
+          <text x="692" y="36" text-anchor="end" class="svg-mono-accent">AUTOSAVE 500ms</text>
+
+          <!-- Left: Piano Roll & Step Grid -->
+          <rect x="16" y="60" width="332" height="148" rx="4" class="svg-zone"/>
+          <text x="28" y="78" class="svg-eyebrow">SEQUENCER · PIANO ROLL &amp; 8-KIT DRUMS</text>
+          <!-- 8x4 grid -->
+          <g transform="translate(28,90)">
+            <rect x="0" y="0" width="36" height="18" rx="2" class="svg-node-accent"/>
+            <rect x="40" y="0" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="80" y="0" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="120" y="0" width="36" height="18" rx="2" class="svg-cell-2"/>
+            <rect x="160" y="0" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="200" y="0" width="36" height="18" rx="2" class="svg-cell-2"/>
+            <rect x="240" y="0" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="280" y="0" width="36" height="18" rx="2" class="svg-cell-0"/>
+
+            <rect x="0" y="22" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="40" y="22" width="36" height="18" rx="2" class="svg-cell-2"/>
+            <rect x="80" y="22" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="120" y="22" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="160" y="22" width="36" height="18" rx="2" class="svg-node-accent"/>
+            <rect x="200" y="22" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="240" y="22" width="36" height="18" rx="2" class="svg-cell-2"/>
+            <rect x="280" y="22" width="36" height="18" rx="2" class="svg-cell-0"/>
+
+            <rect x="0" y="44" width="36" height="18" rx="2" class="svg-cell-2"/>
+            <rect x="40" y="44" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="80" y="44" width="36" height="18" rx="2" class="svg-cell-2"/>
+            <rect x="120" y="44" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="160" y="44" width="36" height="18" rx="2" class="svg-cell-2"/>
+            <rect x="200" y="44" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="240" y="44" width="36" height="18" rx="2" class="svg-cell-2"/>
+            <rect x="280" y="44" width="36" height="18" rx="2" class="svg-cell-0"/>
+          </g>
+          <text x="28" y="176" class="svg-mono">VELOCITY LANES · SCALE HIGHLIGHT</text>
+          <text x="28" y="194" class="svg-mono">KEYS A–L · Z/X OCTAVE · LIVE RECORD</text>
+
+          <!-- Right: Signal Chain -->
+          <rect x="364" y="60" width="340" height="148" rx="4" class="svg-zone"/>
+          <text x="376" y="78" class="svg-eyebrow">WEB AUDIO SUBTRACTIVE ENGINE</text>
+
+          <rect x="376" y="96" width="88" height="44" rx="4" class="svg-node"/>
+          <text x="420" y="115" text-anchor="middle" class="svg-name">OSC</text>
+          <text x="420" y="130" text-anchor="middle" class="svg-mono">saw · sq · sub</text>
+
+          <line x1="464" y1="118" x2="482" y2="118" class="svg-arrow"/>
+          <polygon points="482,114 490,118 482,122" class="svg-arrowhead"/>
+
+          <rect x="490" y="96" width="88" height="44" rx="4" class="svg-node"/>
+          <text x="534" y="115" text-anchor="middle" class="svg-name">LPF + ENV</text>
+          <text x="534" y="130" text-anchor="middle" class="svg-mono">cutoff · res</text>
+
+          <line x1="578" y1="118" x2="596" y2="118" class="svg-arrow"/>
+          <polygon points="596,114 604,118 596,122" class="svg-arrowhead"/>
+
+          <rect x="604" y="96" width="88" height="44" rx="4" class="svg-node-accent"/>
+          <text x="648" y="115" text-anchor="middle" class="svg-name">MASTER</text>
+          <text x="648" y="130" text-anchor="middle" class="svg-mono-accent">comp · out</text>
+
+          <rect x="376" y="154" width="150" height="40" rx="4" class="svg-node-soft"/>
+          <text x="386" y="172" class="svg-name">ADSR &amp; LFO</text>
+          <text x="386" y="186" class="svg-mono">pitch · filter · amp</text>
+
+          <rect x="540" y="154" width="152" height="40" rx="4" class="svg-node-soft"/>
+          <text x="550" y="172" class="svg-name">Sends</text>
+          <text x="550" y="186" class="svg-mono">dotted-8th echo · rev</text>
+
+          <!-- Footer strip -->
+          <line x1="16" y1="224" x2="704" y2="224" class="svg-rule"/>
+          <text x="16" y="242" class="svg-mono">32 PROJECTS MAX (JSON) · 7 DEMOS</text>
+          <text x="704" y="242" text-anchor="end" class="svg-mono">EXPORT MIDI (CH 10 DRUMS) · OFFLINE WAV</text>
+        </svg>
+        <figcaption>Fig 3 — Step sequencer and subtractive synth engine persist to profile storage and continue looping in the sidebar.</figcaption>
+      </figure>
+
+      <div class="copy-row">
+        <pre><code id="code-synthesizer">dsh plugin add github:yishan/dsh-synthesizer</code></pre>
+        <span class="copy">
+          <button type="button" class="copy-button" command="--copy" commandfor="code-synthesizer" aria-label="Copy dsh-synthesizer install command">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5v-.5A1 1 0 0 0 9.5 2H3a1 1 0 0 0-1 1v6.5a1 1 0 0 0 1 1h.5"/></svg>
+          </button>
+          <span class="tip" role="status"></span>
+        </span>
+      </div>
+    </article>
+
+    <!-- 04: dsh-typing-practice -->
+    <article class="plugin" id="typing" aria-labelledby="title-typing">
+      <header class="plugin-head">
+        <div class="plugin-title-row">
+          <span class="eyebrow">04 · PRACTICE</span>
+          <span class="version">v0.2.0</span>
+          <a class="repo-link" href="https://github.com/yishan/dsh-typing-practice">yishan/dsh-typing-practice</a>
+        </div>
+        <h2 id="title-typing">dsh-typing-practice</h2>
+      </header>
+      <p class="plugin-summary">Typing practice and falling-words game in DeepSeek Harness for English, Simplified Chinese, and Cantonese. Supports your own OS input method with bundled Pinyin, Shuangpin, and Jyutping hints, plus mechanical keyboard sound packs.</p>
+
+      <figure class="fig">
+        <svg viewBox="0 0 720 256" role="img" aria-labelledby="fig-typing-title fig-typing-desc">
+          <title id="fig-typing-title">dsh-typing-practice input and feedback schematic</title>
+          <desc id="fig-typing-desc">Built-in passages and 30-day local conversation excerpts flow into Practice or Falling Words modes with native IME composition and local WPM/CPM stats.</desc>
+
+          <!-- Zone 1: Text Sources -->
+          <rect x="16" y="16" width="184" height="192" rx="4" class="svg-zone"/>
+          <text x="28" y="34" class="svg-eyebrow">01 · TEXT SOURCES</text>
+          <rect x="28" y="48" width="160" height="68" rx="4" class="svg-node"/>
+          <text x="38" y="68" class="svg-name">288 Built-in</text>
+          <text x="38" y="84" class="svg-mono">EN · 简体中文 · 粵語</text>
+          <text x="38" y="100" class="svg-mono">96 / lang · S / M / L</text>
+
+          <rect x="28" y="128" width="160" height="66" rx="4" class="svg-node-soft"/>
+          <text x="38" y="148" class="svg-name">Local 30d Logs</text>
+          <text x="38" y="164" class="svg-mono">user + assistant</text>
+          <text x="38" y="180" class="svg-mono">profile excerpts</text>
+
+          <!-- Connector 1 -> 2 -->
+          <line x1="200" y1="112" x2="226" y2="112" class="svg-arrow"/>
+          <polygon points="226,108 234,112 226,116" class="svg-arrowhead"/>
+
+          <!-- Zone 2: Native IME & Modes -->
+          <rect x="234" y="16" width="268" height="192" rx="4" class="svg-zone"/>
+          <text x="246" y="34" class="svg-eyebrow">02 · NATIVE IME &amp; MODES</text>
+
+          <rect x="246" y="48" width="244" height="68" rx="4" class="svg-node-accent"/>
+          <text x="256" y="68" class="svg-name">Practice Mode</text>
+          <text x="256" y="84" class="svg-mono-accent">Pinyin · Shuangpin · Jyutping</text>
+          <text x="256" y="100" class="svg-mono">15s / 30s / 60s · fixed line focus</text>
+
+          <rect x="246" y="128" width="244" height="66" rx="4" class="svg-node"/>
+          <text x="256" y="148" class="svg-name">Falling Words Game</text>
+          <text x="256" y="164" class="svg-mono">IME commit -&gt; fire cursor</text>
+          <text x="256" y="180" class="svg-mono">5 lives · level up every 30s</text>
+
+          <!-- Connector 2 -> 3 -->
+          <line x1="502" y1="112" x2="528" y2="112" class="svg-arrow"/>
+          <polygon points="528,108 536,112 528,116" class="svg-arrowhead"/>
+
+          <!-- Zone 3: Feedback & Sound -->
+          <rect x="536" y="16" width="168" height="192" rx="4" class="svg-zone"/>
+          <text x="548" y="34" class="svg-eyebrow">03 · FEEDBACK</text>
+          <rect x="548" y="48" width="144" height="44" rx="4" class="svg-node"/>
+          <text x="558" y="66" class="svg-name">WPM / CPM</text>
+          <text x="558" y="81" class="svg-mono">accuracy · errors</text>
+
+          <rect x="548" y="100" width="144" height="46" rx="4" class="svg-node"/>
+          <text x="558" y="118" class="svg-name">4 Sound Packs</text>
+          <text x="558" y="133" class="svg-mono">Cherry · Cream · Panda</text>
+
+          <rect x="548" y="154" width="144" height="40" rx="4" class="svg-node-soft"/>
+          <text x="558" y="172" class="svg-name">Local History</text>
+          <text x="558" y="185" class="svg-mono">best + last 100 runs</text>
+
+          <!-- Footer strip -->
+          <line x1="16" y1="224" x2="704" y2="224" class="svg-rule"/>
+          <text x="16" y="242" class="svg-mono">BUNDLED DICTIONARIES (OFFLINE)</text>
+          <text x="704" y="242" text-anchor="end" class="svg-mono">⌘R NEW · ⌘T LANG · ⌘D TIME · ⌘L LEN</text>
+        </svg>
+        <figcaption>Fig 4 — Uses native OS IME composition with offline pronunciation dictionaries and bundled kbsim audio.</figcaption>
+      </figure>
+
+      <div class="copy-row">
+        <pre><code id="code-typing">dsh plugin add dsh-typing-practice</code></pre>
+        <span class="copy">
+          <button type="button" class="copy-button" command="--copy" commandfor="code-typing" aria-label="Copy dsh-typing-practice install command">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5v-.5A1 1 0 0 0 9.5 2H3a1 1 0 0 0-1 1v6.5a1 1 0 0 0 1 1h.5"/></svg>
+          </button>
+          <span class="tip" role="status"></span>
+        </span>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <span>DeepSeek Harness Plugins · by <a href="https://yishan.li">Yishan</a> · MIT</span>
+    <a href="https://github.com/yishan/dsh">yishan/dsh</a>
+    <a href="https://github.com/deepseek-ai/deepseek-harness">DeepSeek Harness</a>
+  </footer>
+</main>
+</body>
+</html>
