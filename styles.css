@@ -8,8 +8,8 @@
   --soft: #7a8399;
   --rule: rgba(45, 49, 66, 0.14);
   --rule-solid: #bfc0c0;
-  --accent: #eb6c36;
-  --accent-tint: rgba(235, 108, 54, 0.08);
+  --accent: #4d6bfe;
+  --accent-tint: rgba(77, 107, 254, 0.08);
   --link: #2e5aa8;
   --cell-1: rgba(45, 49, 66, 0.1);
   --cell-2: rgba(45, 49, 66, 0.24);
@@ -42,8 +42,8 @@
     --soft: light-dark(#7a8399, #8e98ac);
     --rule: light-dark(rgba(45, 49, 66, 0.14), rgba(245, 245, 245, 0.14));
     --rule-solid: light-dark(#bfc0c0, rgba(191, 192, 192, 0.28));
-    --accent: light-dark(#eb6c36, #f08a59);
-    --accent-tint: light-dark(rgba(235, 108, 54, 0.08), rgba(240, 138, 89, 0.12));
+    --accent: light-dark(#4d6bfe, #6b85ff);
+    --accent-tint: light-dark(rgba(77, 107, 254, 0.08), rgba(107, 133, 255, 0.14));
     --link: light-dark(#2e5aa8, #6a95d8);
     --cell-1: light-dark(rgba(45, 49, 66, 0.1), rgba(245, 245, 245, 0.1));
     --cell-2: light-dark(rgba(45, 49, 66, 0.24), rgba(245, 245, 245, 0.24));
@@ -59,8 +59,8 @@
     --soft: #8e98ac;
     --rule: rgba(245, 245, 245, 0.14);
     --rule-solid: rgba(191, 192, 192, 0.28);
-    --accent: #f08a59;
-    --accent-tint: rgba(240, 138, 89, 0.12);
+    --accent: #6b85ff;
+    --accent-tint: rgba(107, 133, 255, 0.14);
     --link: #6a95d8;
     --cell-1: rgba(245, 245, 245, 0.1);
     --cell-2: rgba(245, 245, 245, 0.24);
@@ -76,8 +76,8 @@
     --soft: #8e98ac;
     --rule: rgba(245, 245, 245, 0.14);
     --rule-solid: rgba(191, 192, 192, 0.28);
-    --accent: #f08a59;
-    --accent-tint: rgba(240, 138, 89, 0.12);
+    --accent: #6b85ff;
+    --accent-tint: rgba(107, 133, 255, 0.14);
     --link: #6a95d8;
     --cell-1: rgba(245, 245, 245, 0.1);
     --cell-2: rgba(245, 245, 245, 0.24);
