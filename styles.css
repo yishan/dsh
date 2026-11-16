@@ -15,8 +15,8 @@
   --cell-2: rgba(45, 49, 66, 0.24);
   --border-hairline: 1px;
 
-  --f-display: "Instrument Serif", Georgia, serif;
-  --f-sans: "Geist", system-ui, -apple-system, sans-serif;
+  --f-display: "Instrument Serif", "Noto Serif SC", "Songti SC", Georgia, serif;
+  --f-sans: "Geist", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
   --f-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
   &:has(> head > meta[name="color-scheme"][content="dark"]) {
@@ -162,6 +162,22 @@ button:focus-visible {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 44px;
+  min-block-size: 44px;
+  padding: 0 10px;
+  border: var(--border-hairline) solid var(--rule);
+  border-radius: 6px;
+  color: var(--muted);
+  text-decoration: none;
+  font-family: var(--f-mono);
+  font-size: 12px;
+  transition: color 120ms ease, background-color 120ms ease;
 }
 
 .theme-toggle {
@@ -640,7 +656,8 @@ button:focus-visible {
     text-underline-offset: 4px;
   }
   .theme-toggle:hover,
-  .copy-button:hover {
+  .copy-button:hover,
+  .lang-switch:hover {
     color: var(--ink);
     background: var(--paper-2);
   }
@@ -661,6 +678,7 @@ button:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .index-grid a,
   .copy-button,
+  .lang-switch,
   .tip {
     transition: none;
   }

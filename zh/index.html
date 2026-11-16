@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<script>
+try {
+  const saved = localStorage.getItem('dsh-color-scheme');
+  if (saved === 'light' || saved === 'dark') {
+    document.querySelector('meta[name="color-scheme"]').content = saved;
+  }
+} catch {}
+</script>
+<meta name="description" content="DeepSeek Harness Plugins（by Yishan）：Token 用量与费用看板、每轮工具调用时序回放、Web Audio 多轨合成器，以及支持原生输入法的打字练习插件。">
+<title>DeepSeek Harness Plugins — by Yishan</title>
+<link rel="alternate" hreflang="en" href="../">
+<link rel="alternate" hreflang="zh-CN" href="./">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Noto+Sans+SC:wght@400;500;600&family=Noto+Serif+SC:wght@400&display=swap">
+<link rel="stylesheet" href="../styles.css">
+<script src="../app.js" defer></script>
+<script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#plugins">跳到插件列表</a>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <nav class="topbar-nav" aria-label="插件导航">
+      <a href="#burn">Burn</a>
+      <a href="#sequence">Sequence</a>
+      <a href="#synthesizer">Synthesizer</a>
+      <a href="#typing">Typing</a>
+    </nav>
+    <div class="topbar-actions">
+      <a class="topbar-link" href="https://github.com/yishan/dsh">GitHub</a>
+      <a class="lang-switch" href="../" lang="en" hreflang="en" aria-label="Switch to English">EN</a>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="切换至深色模式" hidden>
+        <svg class="icon-sun" viewBox="0 0 20 20" aria-hidden="true">
+          <circle cx="10" cy="10" r="3.5"/>
+          <path d="M10 2.5v1.8M10 15.7v1.8M2.5 10h1.8M15.7 10h1.8M4.7 4.7l1.3 1.3M14 14l1.3 1.3M4.7 15.3L6 14M14 6l1.3-1.3"/>
+        </svg>
+        <svg class="icon-moon" viewBox="0 0 20 20" aria-hidden="true">
+          <path d="M16.5 11.4A6.8 6.8 0 0 1 8.6 3.5a6.8 6.8 0 1 0 7.9 7.9Z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="page">
+  <section class="hero" aria-labelledby="page-title">
+    <p class="eyebrow">DSH · CORDIS 扩展 · 4 款插件</p>
+    <h1 id="page-title">DeepSeek Harness Plugins</h1>
+    <p class="vice-title">by <a href="https://yishan.li">Yishan</a></p>
+    <p class="lead">为 DeepSeek Harness Web UI 与 CLI 设计的四款专注插件：追踪 Token 消耗与活动热图、回放 Agent 工具调用时序、在 Web Audio 律动工作站中编曲，以及使用原生输入法练习打字。</p>
+
+    <ul class="index-grid" role="list" aria-label="插件索引">
+      <li>
+        <a href="#burn">
+          <span class="index-meta"><span class="index-num">01</span><span class="version">v1.4.1</span></span>
+          <span class="index-name">dsh-burn</span>
+          <span class="index-desc">四类 Token 构成、活动热图与多 Provider 计价</span>
+        </a>
+      </li>
+      <li>
+        <a href="#sequence">
+          <span class="index-meta"><span class="index-num">02</span><span class="version">v0.1.0</span></span>
+          <span class="index-name">dsh-sequence</span>
+          <span class="index-desc">每轮工具调用时序图与动画回放</span>
+        </a>
+      </li>
+      <li>
+        <a href="#synthesizer">
+          <span class="index-meta"><span class="index-num">03</span><span class="version">v1.3.0</span></span>
+          <span class="index-name">dsh-synthesizer</span>
+          <span class="index-desc">Web Audio 多轨合成器与口袋律动工作站</span>
+        </a>
+      </li>
+      <li>
+        <a href="#typing">
+          <span class="index-meta"><span class="index-num">04</span><span class="version">v0.2.0</span></span>
+          <span class="index-name">dsh-typing-practice</span>
+          <span class="index-desc">原生输入法打字练习与落词游戏</span>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <div id="plugins" class="plugin-stack">
+    <!-- 01: dsh-burn -->
+    <article class="plugin" id="burn" aria-labelledby="title-burn">
+      <header class="plugin-head">
+        <div class="plugin-title-row">
+          <span class="eyebrow">01 · 用量与可观测</span>
+          <span class="version">v1.4.1</span>
+          <a class="repo-link" href="https://github.com/yishan/dsh-burn">yishan/dsh-burn</a>
+        </div>
+        <h2 id="title-burn">dsh-burn</h2>
+      </header>
+      <p class="plugin-summary">DeepSeek Harness 的用量与余额看板。仅统计会话自身新增用量（排除继承前缀），将 Token 折叠为四项互不重叠的构成，使用本地 ECharts SVG 渲染日历、星期×小时与 Provider 热图，并支持多路由定价与余额追踪。</p>
+
+      <figure class="fig">
+        <svg viewBox="0 0 720 256" role="img" aria-labelledby="fig-burn-title fig-burn-desc">
+          <title id="fig-burn-title">dsh-burn 数据流示意图</title>
+          <desc id="fig-burn-desc">按 owned 口径过滤的会话日志进入四类 Token 折叠与多 Provider 计价引擎，输出热图、余额与 CSV 导出。</desc>
+
+          <!-- Zone 1: Session Logs -->
+          <rect x="16" y="16" width="204" height="196" rx="4" class="svg-zone"/>
+          <text x="28" y="34" class="svg-eyebrow">01 · 会话日志</text>
+          <rect x="28" y="48" width="180" height="48" rx="4" class="svg-node"/>
+          <text x="38" y="68" class="svg-name">sessionQuery</text>
+          <text x="38" y="83" class="svg-mono">owned 口径 · 排除继承前缀</text>
+          <rect x="28" y="108" width="180" height="48" rx="4" class="svg-node"/>
+          <text x="38" y="128" class="svg-name">Provider × Model</text>
+          <text x="38" y="143" class="svg-mono">路由 ID · 精确模型匹配</text>
+          <rect x="28" y="168" width="180" height="32" rx="4" class="svg-node-soft"/>
+          <text x="38" y="188" class="svg-mono">峰谷时段 · 节假日规则</text>
+
+          <!-- Connector 1 -> 2 -->
+          <line x1="220" y1="114" x2="246" y2="114" class="svg-arrow"/>
+          <polygon points="246,110 254,114 246,118" class="svg-arrowhead"/>
+
+          <!-- Zone 2: 4-Bucket Fold -->
+          <rect x="254" y="16" width="212" height="196" rx="4" class="svg-zone"/>
+          <text x="266" y="34" class="svg-eyebrow">02 · 用量折叠</text>
+          <rect x="266" y="48" width="188" height="32" rx="4" class="svg-node"/>
+          <text x="276" y="68" class="svg-name">未缓存输入</text>
+          <text x="444" y="68" text-anchor="end" class="svg-mono">rate × tok</text>
+
+          <rect x="266" y="86" width="188" height="32" rx="4" class="svg-node-accent"/>
+          <text x="276" y="106" class="svg-name">缓存读</text>
+          <text x="444" y="106" text-anchor="end" class="svg-mono-accent">0.04 / 1M</text>
+
+          <rect x="266" y="124" width="188" height="32" rx="4" class="svg-node"/>
+          <text x="276" y="144" class="svg-name">缓存写</text>
+          <text x="444" y="144" text-anchor="end" class="svg-mono">override</text>
+
+          <rect x="266" y="162" width="188" height="32" rx="4" class="svg-node"/>
+          <text x="276" y="182" class="svg-name">输出</text>
+          <text x="444" y="182" text-anchor="end" class="svg-mono">rate × tok</text>
+
+          <!-- Connector 2 -> 3 -->
+          <line x1="466" y1="114" x2="492" y2="114" class="svg-arrow"/>
+          <polygon points="492,110 500,114 492,118" class="svg-arrowhead"/>
+
+          <!-- Zone 3: Dashboard -->
+          <rect x="500" y="16" width="204" height="196" rx="4" class="svg-zone"/>
+          <text x="512" y="34" class="svg-eyebrow">03 · ECHARTS SVG</text>
+          <text x="512" y="56" class="svg-name">星期 × 小时热图</text>
+          <g transform="translate(512,68)">
+            <rect x="0" y="0" width="22" height="16" rx="2" class="svg-cell-1"/>
+            <rect x="26" y="0" width="22" height="16" rx="2" class="svg-cell-2"/>
+            <rect x="52" y="0" width="22" height="16" rx="2" class="svg-cell-1"/>
+            <rect x="78" y="0" width="22" height="16" rx="2" class="svg-cell-hot"/>
+            <rect x="104" y="0" width="22" height="16" rx="2" class="svg-cell-2"/>
+            <rect x="130" y="0" width="22" height="16" rx="2" class="svg-cell-1"/>
+            <rect x="156" y="0" width="22" height="16" rx="2" class="svg-cell-1"/>
+
+            <rect x="0" y="20" width="22" height="16" rx="2" class="svg-cell-2"/>
+            <rect x="26" y="20" width="22" height="16" rx="2" class="svg-cell-hot"/>
+            <rect x="52" y="20" width="22" height="16" rx="2" class="svg-cell-2"/>
+            <rect x="78" y="20" width="22" height="16" rx="2" class="svg-cell-2"/>
+            <rect x="104" y="20" width="22" height="16" rx="2" class="svg-cell-1"/>
+            <rect x="130" y="20" width="22" height="16" rx="2" class="svg-cell-1"/>
+            <rect x="156" y="20" width="22" height="16" rx="2" class="svg-cell-0"/>
+
+            <rect x="0" y="40" width="22" height="16" rx="2" class="svg-cell-1"/>
+            <rect x="26" y="40" width="22" height="16" rx="2" class="svg-cell-2"/>
+            <rect x="52" y="40" width="22" height="16" rx="2" class="svg-cell-hot"/>
+            <rect x="78" y="40" width="22" height="16" rx="2" class="svg-cell-1"/>
+            <rect x="104" y="40" width="22" height="16" rx="2" class="svg-cell-2"/>
+            <rect x="130" y="40" width="22" height="16" rx="2" class="svg-cell-0"/>
+            <rect x="156" y="40" width="22" height="16" rx="2" class="svg-cell-0"/>
+          </g>
+          <rect x="512" y="138" width="180" height="28" rx="4" class="svg-node"/>
+          <text x="522" y="156" class="svg-mono">CNY · USD 分币种 · 预算</text>
+          <rect x="512" y="172" width="180" height="28" rx="4" class="svg-node-soft"/>
+          <text x="522" y="190" class="svg-mono">0600 缓存 · CSV 导出</text>
+
+          <!-- Legend strip -->
+          <line x1="16" y1="224" x2="704" y2="224" class="svg-rule"/>
+          <rect x="16" y="234" width="10" height="10" rx="2" class="svg-node"/>
+          <text x="32" y="243" class="svg-mono">Token 分类 / 视图</text>
+          <rect x="176" y="234" width="10" height="10" rx="2" class="svg-node-accent"/>
+          <text x="192" y="243" class="svg-mono">缓存命中 / 高峰时段</text>
+          <text x="704" y="243" text-anchor="end" class="svg-mono">DSH &gt;= 0.2.1-rc.5</text>
+        </svg>
+      </figure>
+
+      <div class="copy-row">
+        <pre><code id="code-burn">dsh plugin add github:yishan/dsh-burn</code></pre>
+        <span class="copy">
+          <button type="button" class="copy-button" command="--copy" commandfor="code-burn" aria-label="复制 dsh-burn 安装命令">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5v-.5A1 1 0 0 0 9.5 2H3a1 1 0 0 0-1 1v6.5a1 1 0 0 0 1 1h.5"/></svg>
+          </button>
+          <span class="tip" role="status"></span>
+        </span>
+      </div>
+    </article>
+
+    <!-- 02: dsh-sequence -->
+    <article class="plugin" id="sequence" aria-labelledby="title-sequence">
+      <header class="plugin-head">
+        <div class="plugin-title-row">
+          <span class="eyebrow">02 · 轨迹检查</span>
+          <span class="version">v0.1.0</span>
+          <a class="repo-link" href="https://github.com/yishan/dsh-sequence">yishan/dsh-sequence</a>
+        </div>
+        <h2 id="title-sequence">dsh-sequence</h2>
+      </header>
+      <p class="plugin-summary">对话内每轮 Agent 工具调用时序图与动画回放插件。将 DSH 轨迹事件流编译为确定性 SVG 泳道图，支持并行调用分组、错误与重试标记、慢调用标识，以及一键导出独立 SVG 或可回放 HTML。</p>
+
+      <figure class="fig">
+        <svg viewBox="0 0 720 256" role="img" aria-labelledby="fig-seq-title fig-seq-desc">
+          <title id="fig-seq-title">dsh-sequence 泳道与回放示意图</title>
+          <desc id="fig-seq-desc">用户、Agent、工具、子代理四条生命线展示串行与并行调用、重试标记以及底部回放进度条。</desc>
+
+          <!-- Actor Headers -->
+          <rect x="44" y="16" width="96" height="28" rx="4" class="svg-node"/>
+          <text x="92" y="34" text-anchor="middle" class="svg-name">用户</text>
+
+          <rect x="212" y="16" width="96" height="28" rx="4" class="svg-node-accent"/>
+          <text x="260" y="34" text-anchor="middle" class="svg-name">Agent</text>
+
+          <rect x="392" y="16" width="96" height="28" rx="4" class="svg-node"/>
+          <text x="440" y="34" text-anchor="middle" class="svg-name">工具</text>
+
+          <rect x="572" y="16" width="96" height="28" rx="4" class="svg-node"/>
+          <text x="620" y="34" text-anchor="middle" class="svg-name">子代理</text>
+
+          <!-- Lifelines -->
+          <line x1="92" y1="44" x2="92" y2="206" class="svg-lifeline"/>
+          <line x1="260" y1="44" x2="260" y2="206" class="svg-lifeline"/>
+          <line x1="440" y1="44" x2="440" y2="206" class="svg-lifeline"/>
+          <line x1="620" y1="44" x2="620" y2="206" class="svg-lifeline"/>
+
+          <!-- Activation bars -->
+          <rect x="256" y="64" width="8" height="132" rx="2" class="svg-activation"/>
+          <rect x="436" y="102" width="8" height="24" rx="2" class="svg-activation"/>
+          <rect x="616" y="124" width="8" height="26" rx="2" class="svg-activation-accent"/>
+          <rect x="436" y="158" width="8" height="22" rx="2" class="svg-activation"/>
+
+          <!-- Message 1: User -> Agent -->
+          <line x1="92" y1="68" x2="248" y2="68" class="svg-arrow"/>
+          <polygon points="248,64 256,68 248,72" class="svg-arrowhead"/>
+          <text x="174" y="62" text-anchor="middle" class="svg-mono">本轮输入</text>
+
+          <!-- PAR Frame -->
+          <rect x="236" y="84" width="408" height="70" rx="4" class="svg-frame"/>
+          <rect x="236" y="84" width="36" height="16" rx="2" class="svg-tab"/>
+          <text x="254" y="95" text-anchor="middle" class="svg-eyebrow">PAR</text>
+
+          <!-- Par call 1: Agent -> Tools -->
+          <line x1="264" y1="108" x2="428" y2="108" class="svg-arrow"/>
+          <polygon points="428,104 436,108 428,112" class="svg-arrowhead"/>
+          <text x="350" y="102" text-anchor="middle" class="svg-mono">read_file</text>
+
+          <!-- Par call 2: Agent -> Subagents (focal) -->
+          <line x1="264" y1="132" x2="608" y2="132" class="svg-arrow-accent"/>
+          <polygon points="608,128 616,132 608,136" class="svg-arrowhead-accent"/>
+          <text x="528" y="126" text-anchor="middle" class="svg-mono-accent">invoke_subagent (进行中)</text>
+
+          <!-- Retry / Slow call -->
+          <line x1="436" y1="172" x2="272" y2="172" class="svg-arrow-dashed"/>
+          <polygon points="272,168 264,172 272,176" class="svg-arrowhead"/>
+          <text x="350" y="166" text-anchor="middle" class="svg-mono">retry · &gt;= 3s 慢调用</text>
+
+          <!-- Response: Agent -> User -->
+          <line x1="256" y1="194" x2="100" y2="194" class="svg-arrow-dashed"/>
+          <polygon points="100,190 92,194 100,198" class="svg-arrowhead"/>
+          <text x="174" y="188" text-anchor="middle" class="svg-mono">助手输出</text>
+
+          <!-- Playback Scrubber Strip -->
+          <line x1="16" y1="220" x2="704" y2="220" class="svg-rule"/>
+          <text x="16" y="240" class="svg-mono">播放 / 单步 &lt;- -&gt; · 0.5x–5x</text>
+          <line x1="240" y1="236" x2="490" y2="236" class="svg-rule-solid"/>
+          <circle cx="388" cy="236" r="4" class="svg-dot-accent"/>
+          <text x="704" y="240" text-anchor="end" class="svg-mono">仅看异常 · 导出 SVG / HTML</text>
+        </svg>
+      </figure>
+
+      <div class="copy-row">
+        <pre><code id="code-sequence">dsh plugin add dsh-sequence</code></pre>
+        <span class="copy">
+          <button type="button" class="copy-button" command="--copy" commandfor="code-sequence" aria-label="复制 dsh-sequence 安装命令">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5v-.5A1 1 0 0 0 9.5 2H3a1 1 0 0 0-1 1v6.5a1 1 0 0 0 1 1h.5"/></svg>
+          </button>
+          <span class="tip" role="status"></span>
+        </span>
+      </div>
+    </article>
+
+    <!-- 03: dsh-synthesizer -->
+    <article class="plugin" id="synthesizer" aria-labelledby="title-synthesizer">
+      <header class="plugin-head">
+        <div class="plugin-title-row">
+          <span class="eyebrow">03 · 音频合成</span>
+          <span class="version">v1.3.0</span>
+          <a class="repo-link" href="https://github.com/yishan/dsh-synthesizer">yishan/dsh-synthesizer</a>
+        </div>
+        <h2 id="title-synthesizer">dsh-synthesizer</h2>
+      </header>
+      <p class="plugin-summary">DeepSeek Harness 里的多轨合成器与口袋律动工作站。在钢琴卷帘或 8 件套鼓机步进器上编曲，通过实时 Web Audio 减法合成器塑形音色并循环播放；切回对话后音乐继续在后台响起，工程保存于当前 profile。</p>
+
+      <figure class="fig">
+        <svg viewBox="0 0 720 256" role="img" aria-labelledby="fig-synth-title fig-synth-desc">
+          <title id="fig-synth-title">dsh-synthesizer 律动工作站与信号链示意图</title>
+          <desc id="fig-synth-desc">三层界面结构展示走带控制、钢琴卷帘与鼓机步进网格，以及 Web Audio 减法合成信号链。</desc>
+
+          <!-- Top transport bar -->
+          <rect x="16" y="16" width="688" height="32" rx="4" class="svg-zone"/>
+          <text x="28" y="36" class="svg-mono">走带：播放 / 循环</text>
+          <text x="236" y="36" class="svg-mono">120 BPM · 摇摆 33%</text>
+          <text x="430" y="36" class="svg-mono">4 小节 · ⌘Z 撤销</text>
+          <text x="692" y="36" text-anchor="end" class="svg-mono-accent">500ms 自动保存</text>
+
+          <!-- Left: Piano Roll & Step Grid -->
+          <rect x="16" y="60" width="332" height="148" rx="4" class="svg-zone"/>
+          <text x="28" y="78" class="svg-eyebrow">音序器 · 钢琴卷帘与 8 件套鼓机</text>
+          <g transform="translate(28,90)">
+            <rect x="0" y="0" width="36" height="18" rx="2" class="svg-node-accent"/>
+            <rect x="40" y="0" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="80" y="0" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="120" y="0" width="36" height="18" rx="2" class="svg-cell-2"/>
+            <rect x="160" y="0" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="200" y="0" width="36" height="18" rx="2" class="svg-cell-2"/>
+            <rect x="240" y="0" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="280" y="0" width="36" height="18" rx="2" class="svg-cell-0"/>
+
+            <rect x="0" y="22" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="40" y="22" width="36" height="18" rx="2" class="svg-cell-2"/>
+            <rect x="80" y="22" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="120" y="22" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="160" y="22" width="36" height="18" rx="2" class="svg-node-accent"/>
+            <rect x="200" y="22" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="240" y="22" width="36" height="18" rx="2" class="svg-cell-2"/>
+            <rect x="280" y="22" width="36" height="18" rx="2" class="svg-cell-0"/>
+
+            <rect x="0" y="44" width="36" height="18" rx="2" class="svg-cell-2"/>
+            <rect x="40" y="44" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="80" y="44" width="36" height="18" rx="2" class="svg-cell-2"/>
+            <rect x="120" y="44" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="160" y="44" width="36" height="18" rx="2" class="svg-cell-2"/>
+            <rect x="200" y="44" width="36" height="18" rx="2" class="svg-cell-0"/>
+            <rect x="240" y="44" width="36" height="18" rx="2" class="svg-cell-2"/>
+            <rect x="280" y="44" width="36" height="18" rx="2" class="svg-cell-0"/>
+          </g>
+          <text x="28" y="176" class="svg-mono">力度条 · 调式高亮 · 一键乐句</text>
+          <text x="28" y="194" class="svg-mono">键盘 A–L 弹奏 · Z/X 八度 · 边弹边录</text>
+
+          <!-- Right: Signal Chain -->
+          <rect x="364" y="60" width="340" height="148" rx="4" class="svg-zone"/>
+          <text x="376" y="78" class="svg-eyebrow">WEB AUDIO 减法合成引擎</text>
+
+          <rect x="376" y="96" width="88" height="44" rx="4" class="svg-node"/>
+          <text x="420" y="115" text-anchor="middle" class="svg-name">振荡器</text>
+          <text x="420" y="130" text-anchor="middle" class="svg-mono">saw · sq · sub</text>
+
+          <line x1="464" y1="118" x2="482" y2="118" class="svg-arrow"/>
+          <polygon points="482,114 490,118 482,122" class="svg-arrowhead"/>
+
+          <rect x="490" y="96" width="88" height="44" rx="4" class="svg-node"/>
+          <text x="534" y="115" text-anchor="middle" class="svg-name">低通滤波</text>
+          <text x="534" y="130" text-anchor="middle" class="svg-mono">cutoff · res</text>
+
+          <line x1="578" y1="118" x2="596" y2="118" class="svg-arrow"/>
+          <polygon points="596,114 604,118 596,122" class="svg-arrowhead"/>
+
+          <rect x="604" y="96" width="88" height="44" rx="4" class="svg-node-accent"/>
+          <text x="648" y="115" text-anchor="middle" class="svg-name">主总线</text>
+          <text x="648" y="130" text-anchor="middle" class="svg-mono-accent">压缩 · 输出</text>
+
+          <rect x="376" y="154" width="150" height="40" rx="4" class="svg-node-soft"/>
+          <text x="386" y="172" class="svg-name">ADSR 与 LFO</text>
+          <text x="386" y="186" class="svg-mono">音高 · 滤波 · 音量</text>
+
+          <rect x="540" y="154" width="152" height="40" rx="4" class="svg-node-soft"/>
+          <text x="550" y="172" class="svg-name">效果发送</text>
+          <text x="550" y="186" class="svg-mono">附点八分回声 · 混响</text>
+
+          <!-- Footer strip -->
+          <line x1="16" y1="224" x2="704" y2="224" class="svg-rule"/>
+          <text x="16" y="242" class="svg-mono">最多 32 个工程 (JSON) · 7 首示范曲</text>
+          <text x="704" y="242" text-anchor="end" class="svg-mono">导出 MIDI (第10通道鼓) · 离线 WAV</text>
+        </svg>
+      </figure>
+
+      <div class="copy-row">
+        <pre><code id="code-synthesizer">dsh plugin add github:yishan/dsh-synthesizer</code></pre>
+        <span class="copy">
+          <button type="button" class="copy-button" command="--copy" commandfor="code-synthesizer" aria-label="复制 dsh-synthesizer 安装命令">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5v-.5A1 1 0 0 0 9.5 2H3a1 1 0 0 0-1 1v6.5a1 1 0 0 0 1 1h.5"/></svg>
+          </button>
+          <span class="tip" role="status"></span>
+        </span>
+      </div>
+    </article>
+
+    <!-- 04: dsh-typing-practice -->
+    <article class="plugin" id="typing" aria-labelledby="title-typing">
+      <header class="plugin-head">
+        <div class="plugin-title-row">
+          <span class="eyebrow">04 · 打字练习</span>
+          <span class="version">v0.2.0</span>
+          <a class="repo-link" href="https://github.com/yishan/dsh-typing-practice">yishan/dsh-typing-practice</a>
+        </div>
+        <h2 id="title-typing">dsh-typing-practice</h2>
+      </header>
+      <p class="plugin-summary">DeepSeek Harness 内的英文、简体中文与粤语打字练习及落词游戏。直接使用系统原生输入法，内置拼音、双拼与粤拼提示词典，并附带机械键盘音效包与本地成绩记录。</p>
+
+      <figure class="fig">
+        <svg viewBox="0 0 720 256" role="img" aria-labelledby="fig-typing-title fig-typing-desc">
+          <title id="fig-typing-title">dsh-typing-practice 输入与反馈示意图</title>
+          <desc id="fig-typing-desc">内置短文与近 30 天本地对话片段进入练习或落词模式，配合原生输入法上屏与本地 WPM/CPM 统计。</desc>
+
+          <!-- Zone 1: Text Sources -->
+          <rect x="16" y="16" width="184" height="192" rx="4" class="svg-zone"/>
+          <text x="28" y="34" class="svg-eyebrow">01 · 文本来源</text>
+          <rect x="28" y="48" width="160" height="68" rx="4" class="svg-node"/>
+          <text x="38" y="68" class="svg-name">288 篇内置短文</text>
+          <text x="38" y="84" class="svg-mono">EN · 简体中文 · 粵語</text>
+          <text x="38" y="100" class="svg-mono">每语 96 篇 · 短/中/长</text>
+
+          <rect x="28" y="128" width="160" height="66" rx="4" class="svg-node-soft"/>
+          <text x="38" y="148" class="svg-name">近 30 天对话</text>
+          <text x="38" y="164" class="svg-mono">用户 + 模型回复</text>
+          <text x="38" y="180" class="svg-mono">当前 profile 片段</text>
+
+          <!-- Connector 1 -> 2 -->
+          <line x1="200" y1="112" x2="226" y2="112" class="svg-arrow"/>
+          <polygon points="226,108 234,112 226,116" class="svg-arrowhead"/>
+
+          <!-- Zone 2: Native IME & Modes -->
+          <rect x="234" y="16" width="268" height="192" rx="4" class="svg-zone"/>
+          <text x="246" y="34" class="svg-eyebrow">02 · 原生输入法与模式</text>
+
+          <rect x="246" y="48" width="244" height="68" rx="4" class="svg-node-accent"/>
+          <text x="256" y="68" class="svg-name">打字练习模式</text>
+          <text x="256" y="84" class="svg-mono-accent">全拼 · 双拼 · 粤拼提示</text>
+          <text x="256" y="100" class="svg-mono">15s / 30s / 60s · 固定行焦点</text>
+
+          <rect x="246" y="128" width="244" height="66" rx="4" class="svg-node"/>
+          <text x="256" y="148" class="svg-name">落词游戏</text>
+          <text x="256" y="164" class="svg-mono">输入法上屏 -&gt; 发射击中</text>
+          <text x="256" y="180" class="svg-mono">5 点生命 · 每 30s 升级</text>
+
+          <!-- Connector 2 -> 3 -->
+          <line x1="502" y1="112" x2="528" y2="112" class="svg-arrow"/>
+          <polygon points="528,108 536,112 528,116" class="svg-arrowhead"/>
+
+          <!-- Zone 3: Feedback & Sound -->
+          <rect x="536" y="16" width="168" height="192" rx="4" class="svg-zone"/>
+          <text x="548" y="34" class="svg-eyebrow">03 · 实时反馈</text>
+          <rect x="548" y="48" width="144" height="44" rx="4" class="svg-node"/>
+          <text x="558" y="66" class="svg-name">WPM / CPM</text>
+          <text x="558" y="81" class="svg-mono">准确率 · 错误计数</text>
+
+          <rect x="548" y="100" width="144" height="46" rx="4" class="svg-node"/>
+          <text x="558" y="118" class="svg-name">4 套机械轴音效</text>
+          <text x="558" y="133" class="svg-mono">Cherry · Cream · Panda</text>
+
+          <rect x="548" y="154" width="144" height="40" rx="4" class="svg-node-soft"/>
+          <text x="558" y="172" class="svg-name">本地历史记录</text>
+          <text x="558" y="185" class="svg-mono">最佳成绩 + 最近 100 轮</text>
+
+          <!-- Footer strip -->
+          <line x1="16" y1="224" x2="704" y2="224" class="svg-rule"/>
+          <text x="16" y="242" class="svg-mono">离线内置注音词典</text>
+          <text x="704" y="242" text-anchor="end" class="svg-mono">⌘R 换篇 · ⌘T 语言 · ⌘D 时长 · ⌘L 篇幅</text>
+        </svg>
+      </figure>
+
+      <div class="copy-row">
+        <pre><code id="code-typing">dsh plugin add dsh-typing-practice</code></pre>
+        <span class="copy">
+          <button type="button" class="copy-button" command="--copy" commandfor="code-typing" aria-label="复制 dsh-typing-practice 安装命令">
+            <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="5.5" y="5.5" width="8" height="8" rx="1.5"/><path d="M10.5 3.5v-.5A1 1 0 0 0 9.5 2H3a1 1 0 0 0-1 1v6.5a1 1 0 0 0 1 1h.5"/></svg>
+          </button>
+          <span class="tip" role="status"></span>
+        </span>
+      </div>
+    </article>
+  </div>
+
+  <footer class="site-footer">
+    <span>DeepSeek Harness Plugins · by <a href="https://yishan.li">Yishan</a> · MIT</span>
+    <a href="https://github.com/yishan/dsh">yishan/dsh</a>
+    <a href="https://github.com/deepseek-ai/deepseek-harness">DeepSeek Harness</a>
+  </footer>
+</main>
+</body>
+</html>

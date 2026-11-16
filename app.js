@@ -1,3 +1,8 @@
+const isZh = document.documentElement.lang.toLowerCase().startsWith('zh');
+const i18n = isZh
+  ? { toLight: '切换至浅色模式', toDark: '切换至深色模式', copied: '已复制', failed: '复制失败' }
+  : { toLight: 'Switch to light color scheme', toDark: 'Switch to dark color scheme', copied: 'Copied', failed: 'Copy failed' };
+
 // Theme toggle: two-state (system default vs opposite override) synced with <meta name="color-scheme">.
 const meta = document.querySelector('meta[name="color-scheme"]');
 const toggle = document.getElementById('theme-toggle');
@@ -13,7 +18,7 @@ function updateToggleLabel() {
   if (!toggle) return;
   toggle.setAttribute(
     'aria-label',
-    currentRenderedDark() ? 'Switch to light color scheme' : 'Switch to dark color scheme'
+    currentRenderedDark() ? i18n.toLight : i18n.toDark
   );
 }
 
@@ -57,7 +62,7 @@ function report(button, ok) {
   button.removeAttribute('data-copied');
   button.removeAttribute('data-failed');
 
-  let message = ok ? 'Copied' : 'Copy failed';
+  let message = ok ? i18n.copied : i18n.failed;
   if (message === lastMessage) message += '\u00A0';
   lastMessage = message;
 
