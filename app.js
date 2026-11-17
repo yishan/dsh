@@ -1,4 +1,10 @@
 const isZh = document.documentElement.lang.toLowerCase().startsWith('zh');
+const langSwitch = document.querySelector('.lang-switch');
+if (langSwitch) {
+  langSwitch.addEventListener('click', () => {
+    try { localStorage.setItem('dsh-lang', isZh ? 'en' : 'zh'); } catch {}
+  });
+}
 const i18n = isZh
   ? { toLight: '切换至浅色模式', toDark: '切换至深色模式', copied: '已复制', failed: '复制失败' }
   : { toLight: 'Switch to light color scheme', toDark: 'Switch to dark color scheme', copied: 'Copied', failed: 'Copy failed' };

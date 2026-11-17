@@ -6,9 +6,14 @@
 <meta name="color-scheme" content="light dark">
 <script>
 try {
-  const saved = localStorage.getItem('dsh-color-scheme');
-  if (saved === 'light' || saved === 'dark') {
-    document.querySelector('meta[name="color-scheme"]').content = saved;
+  const savedTheme = localStorage.getItem('dsh-color-scheme');
+  if (savedTheme === 'light' || savedTheme === 'dark') {
+    document.querySelector('meta[name="color-scheme"]').content = savedTheme;
+  }
+  const savedLang = localStorage.getItem('dsh-lang');
+  const sysLang = ((navigator.languages && navigator.languages[0]) || navigator.language || '').toLowerCase();
+  if (savedLang === 'zh' || (!savedLang && sysLang.startsWith('zh'))) {
+    location.replace('zh/' + location.hash);
   }
 } catch {}
 </script>
