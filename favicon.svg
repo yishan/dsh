@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    .bg { fill: #f5f5f5; }
+    .cell { fill: #ececec; stroke: #2d3142; stroke-width: 1.5; }
+    .focal { fill: #4d6bfe; stroke: #4d6bfe; stroke-width: 1.5; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #181a22; }
+      .cell { fill: #222530; stroke: #f5f5f5; }
+      .focal { fill: #6b85ff; stroke: #6b85ff; }
+    }
+  </style>
+  <rect width="32" height="32" rx="7" class="bg"/>
+  <rect x="6" y="6" width="8.5" height="8.5" rx="2" class="cell"/>
+  <rect x="17.5" y="6" width="8.5" height="8.5" rx="2" class="focal"/>
+  <rect x="6" y="17.5" width="8.5" height="8.5" rx="2" class="cell"/>
+  <rect x="17.5" y="17.5" width="8.5" height="8.5" rx="2" class="cell"/>
+</svg>
