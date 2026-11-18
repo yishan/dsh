@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" width="900" height="1200">
+  <defs>
+    <style>
+      .paper { fill: #f5f5f5; }
+      .paper2 { fill: #ececec; }
+      .card { fill: #ffffff; stroke: #bfc0c0; stroke-width: 1; }
+      .card-soft { fill: #f5f5f5; stroke: rgba(45,49,66,0.16); stroke-width: 1; }
+      .card-accent { fill: rgba(77,107,254,0.08); stroke: #4d6bfe; stroke-width: 1.4; }
+      .zone { fill: #ececec; stroke: rgba(45,49,66,0.14); stroke-width: 1; }
+      .outer { fill: none; stroke: rgba(45,49,66,0.14); stroke-width: 1; }
+      .rule { stroke: rgba(45,49,66,0.14); stroke-width: 1; }
+      .arrow { stroke: #2d3142; stroke-width: 1.2; }
+      .arrowhead { fill: #2d3142; }
+      .eyebrow { font-family: "Geist Mono", ui-monospace, monospace; font-size: 13px; font-weight: 500; letter-spacing: 0.14em; fill: #7a8399; }
+      .tag { font-family: "Geist Mono", ui-monospace, monospace; font-size: 12px; font-weight: 500; letter-spacing: 0.12em; fill: #4d6bfe; }
+      .title { font-family: "Geist", "PingFang SC", sans-serif; font-size: 52px; font-weight: 600; letter-spacing: -0.02em; fill: #2d3142; }
+      .subtitle { font-family: "Geist", "PingFang SC", sans-serif; font-size: 20px; font-weight: 400; fill: #4f5d75; }
+      .name { font-family: "Geist", "PingFang SC", sans-serif; font-size: 18px; font-weight: 600; fill: #2d3142; }
+      .mono { font-family: "Geist Mono", "PingFang SC", monospace; font-size: 14px; fill: #4f5d75; }
+      .mono-accent { font-family: "Geist Mono", "PingFang SC", monospace; font-size: 14px; font-weight: 500; fill: #4d6bfe; }
+      .cmd { font-family: "Geist Mono", monospace; font-size: 16px; fill: #2d3142; }
+      .footer { font-family: "Geist", "PingFang SC", sans-serif; font-size: 15px; fill: #4f5d75; }
+      .footer-link { font-family: "Geist Mono", monospace; font-size: 15px; font-weight: 500; fill: #4d6bfe; }
+      .c0 { fill: #ffffff; stroke: rgba(45,49,66,0.14); stroke-width: 1; }
+      .c1 { fill: rgba(45,49,66,0.10); }
+      .c2 { fill: rgba(45,49,66,0.24); }
+      .chot { fill: #4d6bfe; }
+    </style>
+  </defs>
+
+  <rect width="900" height="1200" class="paper"/>
+  <rect x="28" y="28" width="844" height="1144" rx="8" class="outer"/>
+
+  <!-- Header -->
+  <text x="60" y="76" class="eyebrow">01 · 用量 · V1.4.1</text>
+  <text x="840" y="76" text-anchor="end" class="tag">DEEPSEEK HARNESS PLUGIN</text>
+  <text x="60" y="138" class="title">dsh-burn</text>
+  <text x="60" y="178" class="subtitle">四类 Token 构成、活动热图与多 Provider 费用看板</text>
+  <line x1="60" y1="208" x2="840" y2="208" class="rule"/>
+
+  <!-- Zone 1: Session Logs -->
+  <rect x="60" y="236" width="780" height="148" rx="6" class="zone"/>
+  <text x="84" y="266" class="eyebrow">01 · 会话日志</text>
+  <rect x="84" y="286" width="234" height="74" rx="4" class="card"/>
+  <text x="102" y="316" class="name">sessionQuery</text>
+  <text x="102" y="342" class="mono">owned 口径 · 排除继承前缀</text>
+
+  <rect x="333" y="286" width="234" height="74" rx="4" class="card"/>
+  <text x="351" y="316" class="name">Provider × Model</text>
+  <text x="351" y="342" class="mono">路由 ID · 精确模型匹配</text>
+
+  <rect x="582" y="286" width="234" height="74" rx="4" class="card-soft"/>
+  <text x="600" y="316" class="name">计价时段</text>
+  <text x="600" y="342" class="mono">峰谷时段 · 节假日规则</text>
+
+  <!-- Arrow 1 -> 2 -->
+  <line x1="450" y1="384" x2="450" y2="414" class="arrow"/>
+  <polygon points="444,414 450,424 456,414" class="arrowhead"/>
+
+  <!-- Zone 2: 4-Bucket Fold -->
+  <rect x="60" y="424" width="780" height="232" rx="6" class="zone"/>
+  <text x="84" y="454" class="eyebrow">02 · 四类 TOKEN 折叠</text>
+
+  <rect x="84" y="474" width="356" height="72" rx="4" class="card"/>
+  <text x="104" y="505" class="name">未缓存输入</text>
+  <text x="104" y="530" class="mono">Uncached Input</text>
+  <text x="420" y="516" text-anchor="end" class="mono">rate × tok</text>
+
+  <rect x="460" y="474" width="356" height="72" rx="4" class="card-accent"/>
+  <text x="480" y="505" class="name">缓存读 (Cache Hit)</text>
+  <text x="480" y="530" class="mono-accent">0.04 CNY / 1M (谷时 0.02)</text>
+
+  <rect x="84" y="562" width="356" height="72" rx="4" class="card"/>
+  <text x="104" y="593" class="name">缓存写</text>
+  <text x="104" y="618" class="mono">Cache Write · 可逐项覆盖</text>
+
+  <rect x="460" y="562" width="356" height="72" rx="4" class="card"/>
+  <text x="480" y="593" class="name">输出</text>
+  <text x="480" y="618" class="mono">Output · 按当前设置重算</text>
+
+  <!-- Arrow 2 -> 3 -->
+  <line x1="450" y1="656" x2="450" y2="686" class="arrow"/>
+  <polygon points="444,686 450,696 456,686" class="arrowhead"/>
+
+  <!-- Zone 3: ECharts SVG Heatmap & Balances -->
+  <rect x="60" y="696" width="780" height="240" rx="6" class="zone"/>
+  <text x="84" y="726" class="eyebrow">03 · ECHARTS SVG 热图与余额</text>
+
+  <rect x="84" y="746" width="440" height="166" rx="4" class="card"/>
+  <text x="104" y="776" class="name">星期 × 小时热图</text>
+  <g transform="translate(104,794)">
+    <rect x="0" y="0" width="52" height="28" rx="3" class="c1"/>
+    <rect x="58" y="0" width="52" height="28" rx="3" class="c2"/>
+    <rect x="116" y="0" width="52" height="28" rx="3" class="c1"/>
+    <rect x="174" y="0" width="52" height="28" rx="3" class="chot"/>
+    <rect x="232" y="0" width="52" height="28" rx="3" class="c2"/>
+    <rect x="290" y="0" width="52" height="28" rx="3" class="c1"/>
+    <rect x="348" y="0" width="52" height="28" rx="3" class="c1"/>
+
+    <rect x="0" y="34" width="52" height="28" rx="3" class="c2"/>
+    <rect x="58" y="34" width="52" height="28" rx="3" class="chot"/>
+    <rect x="116" y="34" width="52" height="28" rx="3" class="c2"/>
+    <rect x="174" y="34" width="52" height="28" rx="3" class="c2"/>
+    <rect x="232" y="34" width="52" height="28" rx="3" class="c1"/>
+    <rect x="290" y="34" width="52" height="28" rx="3" class="c1"/>
+    <rect x="348" y="34" width="52" height="28" rx="3" class="c0"/>
+
+    <rect x="0" y="68" width="52" height="28" rx="3" class="c1"/>
+    <rect x="58" y="68" width="52" height="28" rx="3" class="c2"/>
+    <rect x="116" y="68" width="52" height="28" rx="3" class="chot"/>
+    <rect x="174" y="68" width="52" height="28" rx="3" class="c1"/>
+    <rect x="232" y="68" width="52" height="28" rx="3" class="c2"/>
+    <rect x="290" y="68" width="52" height="28" rx="3" class="c0"/>
+    <rect x="348" y="68" width="52" height="28" rx="3" class="c0"/>
+  </g>
+
+  <rect x="544" y="746" width="272" height="75" rx="4" class="card"/>
+  <text x="564" y="777" class="name">多币种与预算</text>
+  <text x="564" y="803" class="mono">CNY · USD 分开累计</text>
+
+  <rect x="544" y="837" width="272" height="75" rx="4" class="card-soft"/>
+  <text x="564" y="868" class="name">本地缓存与导出</text>
+  <text x="564" y="894" class="mono">0600 隔离缓存 · CSV</text>
+
+  <!-- Legend Strip -->
+  <line x1="60" y1="964" x2="840" y2="964" class="rule"/>
+  <rect x="60" y="986" width="14" height="14" rx="2" class="card"/>
+  <text x="84" y="998" class="mono">Token 分类 / 视图</text>
+  <rect x="256" y="986" width="14" height="14" rx="2" class="card-accent"/>
+  <text x="280" y="998" class="mono">缓存命中 / 高峰时段</text>
+  <text x="840" y="998" text-anchor="end" class="mono-accent">PKG: dsh-burn</text>
+
+  <!-- Install Command -->
+  <rect x="60" y="1028" width="780" height="56" rx="6" class="zone"/>
+  <text x="84" y="1062" class="cmd">$ dsh plugin add github:yishan/dsh-burn</text>
+
+  <!-- Footer -->
+  <line x1="60" y1="1112" x2="840" y2="1112" class="rule"/>
+  <text x="60" y="1144" class="footer">DeepSeek Harness Plugins · by Yishan</text>
+  <text x="840" y="1144" text-anchor="end" class="footer-link">dsh.yishan.app</text>
+</svg>
